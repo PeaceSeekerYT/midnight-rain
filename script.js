@@ -1,3 +1,5 @@
+window.onload = () => {
+
 const canvas = document.getElementById("rainCanvas");
 const ctx = canvas.getContext("2d");
 
@@ -77,7 +79,7 @@ class Ripple {
 let rain = [];
 let ripples = [];
 
-// layered rain (depth effect)
+// layered rain
 function createRain() {
   rain = [];
   for (let i = 0; i < rainCount; i++) {
@@ -119,10 +121,8 @@ function randomLightning() {
 // ---------------- ANIMATE ----------------
 function animate() {
 
-  // smooth wind
   wind += (windTarget - wind) * 0.05;
 
-  // sky gradient
   const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
   grad.addColorStop(0, "#02040a");
   grad.addColorStop(1, "#0b1f3a");
@@ -130,17 +130,14 @@ function animate() {
   ctx.fillStyle = grad;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  // subtle water glow
   ctx.fillStyle = "rgba(30,80,140,0.08)";
   ctx.fillRect(0, canvas.height * 0.75, canvas.width, canvas.height);
 
-  // rain
   rain.forEach(r => {
     r.update();
     r.draw();
   });
 
-  // ripples
   for (let i = ripples.length - 1; i >= 0; i--) {
     ripples[i].update();
     ripples[i].draw();
@@ -150,7 +147,6 @@ function animate() {
     }
   }
 
-  // lightning flash
   if (flash > 0) {
     ctx.fillStyle = `rgba(255,255,255,${flash})`;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -163,3 +159,5 @@ function animate() {
 }
 
 animate();
+
+};
