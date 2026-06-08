@@ -1,10 +1,19 @@
 window.onload = () => {
 alert("script loaded");
+
 const canvas = document.getElementById("rainCanvas");
 const ctx = canvas.getContext("2d");
 
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+// Set canvas size
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+
+resizeCanvas();
+
+// NEW: Resize canvas when browser window changes size
+window.addEventListener("resize", resizeCanvas);
 
 // ---------------- SETTINGS ----------------
 let windTarget = 0;
