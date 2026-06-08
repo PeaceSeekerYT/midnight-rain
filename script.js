@@ -12,7 +12,7 @@ function resizeCanvas() {
 
 resizeCanvas();
 
-// NEW: Resize canvas when browser window changes size
+// Resize canvas when browser size changes
 window.addEventListener("resize", resizeCanvas);
 
 // ---------------- SETTINGS ----------------
@@ -37,7 +37,9 @@ class RainDrop {
 
   update() {
     this.y += this.speed;
-    this.x += wind * this.layer;
+
+    // Stronger wind influence
+    this.x += wind * 2 * this.layer;
 
     if (this.y > canvas.height) {
       ripples.push(new Ripple(this.x, canvas.height - 5));
@@ -50,12 +52,24 @@ class RainDrop {
   }
 
   draw() {
-    ctx.strokeStyle = this.layer === 1 ? "#8ecfff" : "#5a8bbd";
+
+    // Brighter rain colors
+    ctx.strokeStyle =
+      this.layer === 1
+        ? "#b9e6ff"
+        : "#84b8e6";
+
     ctx.lineWidth = this.layer;
 
     ctx.beginPath();
     ctx.moveTo(this.x, this.y);
-    ctx.lineTo(this.x - wind * 4, this.y + this.len);
+
+    // Stronger visual angle from wind
+    ctx.lineTo(
+      this.x - wind * 10,
+      this.y + this.len
+    );
+
     ctx.stroke();
   }
 }
@@ -75,11 +89,17 @@ class Ripple {
   }
 
   draw() {
-    ctx.strokeStyle = `rgba(180,220,255,${this.alpha})`;
+    ctx.strokeStyle = `rgba(200,230,255,${this.alpha})`;
     ctx.lineWidth = 2;
 
     ctx.beginPath();
-    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+    ctx.arc(
+      this.x,
+      this.y,
+      this.radius,
+      0,
+      Math.PI * 2
+    );
     ctx.stroke();
   }
 }
@@ -88,31 +108,44 @@ class Ripple {
 let rain = [];
 let ripples = [];
 
-// layered rain
 function createRain() {
   rain = [];
+
   for (let i = 0; i < rainCount; i++) {
-    rain.push(new RainDrop(Math.random() > 0.5 ? 1 : 0.7));
+    rain.push(
+      new RainDrop(
+        Math.random() > 0.5 ? 1 : 0.7
+      )
+    );
   }
 }
+
 createRain();
 
 // ---------------- INTERACTION ----------------
 window.addEventListener("mousemove", (e) => {
-  windTarget = (e.clientX / window.innerWidth - 0.5) * 3;
+
+  // Much stronger wind effect
+  windTarget =
+    (e.clientX / window.innerWidth - 0.5) * 10;
+
 });
 
 canvas.addEventListener("click", (e) => {
-  const rect = canvas.getBoundingClientRect();
 
-  ripples.push(new Ripple(
-    e.clientX - rect.left,
-    e.clientY - rect.top
-  ));
+  const rect =
+    canvas.getBoundingClientRect();
+
+  ripples.push(
+    new Ripple(
+      e.clientX - rect.left,
+      e.clientY - rect.top
+    )
+  );
 });
 
 document.getElementById("thunderBtn").onclick = () => {
-  flash = 1;
+  flash = 1.4;
 };
 
 document.getElementById("rainSlider").oninput = (e) => {
@@ -123,31 +156,54 @@ document.getElementById("rainSlider").oninput = (e) => {
 // ---------------- LIGHTNING ----------------
 function randomLightning() {
   if (Math.random() < 0.003) {
-    flash = 1;
+    flash = 1.4;
   }
 }
 
-// ---------------- ANIMATE ----------------
+// ---------------- ANIMATION ----------------
 function animate() {
 
   wind += (windTarget - wind) * 0.05;
 
-  const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
-  grad.addColorStop(0, "#02040a");
-  grad.addColorStop(1, "#0b1f3a");
+  // Brighter storm sky
+  const grad = ctx.createLinearGradient(
+    0,
+    0,
+    0,
+    canvas.height
+  );
+
+  grad.addColorStop(0, "#18395f");
+  grad.addColorStop(1, "#2f5c87");
 
   ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  ctx.fillStyle = "rgba(30,80,140,0.08)";
-  ctx.fillRect(0, canvas.height * 0.75, canvas.width, canvas.height);
+  ctx.fillRect(
+    0,
+    0,
+    canvas.width,
+    canvas.height
+  );
 
+  // Water reflection
+  ctx.fillStyle = "rgba(120,180,255,0.10)";
+
+  ctx.fillRect(
+    0,
+    canvas.height * 0.75,
+    canvas.width,
+    canvas.height
+  );
+
+  // Rain
   rain.forEach(r => {
     r.update();
     r.draw();
   });
 
+  // Ripples
   for (let i = ripples.length - 1; i >= 0; i--) {
+
     ripples[i].update();
     ripples[i].draw();
 
@@ -156,10 +212,30 @@ function animate() {
     }
   }
 
+  // Lightning flash
   if (flash > 0) {
-    ctx.fillStyle = `rgba(255,255,255,${flash})`;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    flash -= 0.04;
+
+    ctx.fillStyle =
+      `rgba(220,240,255,${flash})`;
+
+    ctx.fillRect(
+      0,
+      0,
+      canvas.width,
+      canvas.height
+    );
+
+    ctx.fillStyle =
+      `rgba(180,220,255,${flash * 0.4})`;
+
+    ctx.fillRect(
+      0,
+      0,
+      canvas.width,
+      canvas.height
+    );
+
+    flash -= 0.025;
   }
 
   randomLightning();
